@@ -296,8 +296,9 @@ def build_page(page):
     robots = "noindex, follow" if page.get("noindex") else "index, follow, max-image-preview:large"
     home = root or "./"
 
+    active = ' aria-current="page" class="is-active"'
     nav = "\n".join(
-        f'      <a href="{root}{href}"{" aria-current=\"page\" class=\"is-active\"" if href == page["path"] else ""}>{label}</a>'
+        f'      <a href="{root}{href}"{active if href == page["path"] else ""}>{label}</a>'
         for href, label in NAV)
     menu = "\n".join(f'      <a href="{root}{href}"><i>0{i + 2}</i>{label}</a>' for i, (href, label) in enumerate(NAV))
     zones_footer = ", ".join(ZONES[:8])
