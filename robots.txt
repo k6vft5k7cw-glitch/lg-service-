@@ -1,5 +1,7 @@
 User-agent: *
 Allow: /
 Disallow: /src/
+Disallow: /SEO-AGENT.md
+Disallow: /SEO-LOG.md
 
 Sitemap: https://www.debarras-lg-service.fr/sitemap.xml

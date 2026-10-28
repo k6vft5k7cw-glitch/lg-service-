@@ -436,7 +436,7 @@ def main():
     (ROOT / "sitemap.xml").write_text(
         '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
         + "\n".join(urls) + "\n</urlset>\n")
-    (ROOT / "robots.txt").write_text(f"User-agent: *\nAllow: /\nDisallow: /src/\n\nSitemap: {SITE}/sitemap.xml\n")
+    (ROOT / "robots.txt").write_text(f"User-agent: *\nAllow: /\nDisallow: /src/\nDisallow: /SEO-AGENT.md\nDisallow: /SEO-LOG.md\n\nSitemap: {SITE}/sitemap.xml\n")
     print("écrit sitemap.xml, robots.txt")
 
 
