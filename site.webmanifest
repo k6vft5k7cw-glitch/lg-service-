@@ -1,0 +1,13 @@
+{
+  "name": "LG Service – Débarras et location de bennes à Morestel",
+  "short_name": "LG Service",
+  "lang": "fr",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#0e0e10",
+  "theme_color": "#0e0e10",
+  "icons": [
+    { "src": "assets/img/apple-touch-icon.png", "sizes": "180x180", "type": "image/png" },
+    { "src": "assets/img/logo.png", "sizes": "320x320", "type": "image/png" }
+  ]
+}

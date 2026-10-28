@@ -1,0 +1,43 @@
+<section class="contact" id="contact">
+  <div class="container contact__inner">
+    <div class="contact__info">
+      <p class="kicker reveal-up">Contact</p>
+      <{{heading_tag}} class="split contact__title">{{heading}}</{{heading_tag}}>
+      <p class="contact__lead reveal-up">Besoin de renseignements, d'un devis ? Écrivez ou appelez-nous.</p>
+      <ul class="info">
+        <li class="reveal-up"><span>Téléphone</span><a href="tel:+33681219360">06 81 21 93 60</a></li>
+        <li class="reveal-up"><span>E-mail</span><a href="mailto:contact@debarras-lg-service.fr">contact@debarras-lg-service.fr</a></li>
+        <li class="reveal-up"><span>Adresse</span><address>Chemin De La Plaine<br>01300 Brégnier-Cordon, France</address></li>
+        <li class="reveal-up"><span>Horaires</span><p>Du lundi au dimanche<br><b class="open"><i></i>Ouvert 24 heures sur 24</b></p></li>
+        <li class="reveal-up"><span>Paiement</span><p>Chèques · Espèces · Virements</p></li>
+        <li class="reveal-up"><span>Suivez-nous</span><a href="https://facebook.com/p/LG-services-100069107802754/" target="_blank" rel="noopener">Facebook ↗</a></li>
+      </ul>
+    </div>
+    <form class="form reveal-up" id="contact-form" novalidate>
+      <p class="form__title">Demandez votre devis</p>
+      <div class="field"><input id="f-name" name="name" type="text" required autocomplete="name" placeholder=" "><label for="f-name">Nom *</label></div>
+      <div class="field"><input id="f-email" name="email" type="email" required autocomplete="email" placeholder=" "><label for="f-email">E-mail *</label></div>
+      <div class="field"><input id="f-tel" name="tel" type="tel" required autocomplete="tel" placeholder=" "><label for="f-tel">Téléphone *</label></div>
+      <div class="field field--select">
+        <select id="f-type" name="type">
+          <option>Location de bennes</option>
+          <option>Débarras</option>
+          <option>Achat / vente de métaux</option>
+          <option>Autre demande</option>
+        </select>
+        <label for="f-type">Votre besoin</label>
+      </div>
+      <div class="field"><textarea id="f-msg" name="message" rows="4" required placeholder=" "></textarea><label for="f-msg">Message *</label></div>
+      <label class="check"><input type="checkbox" name="consent" required><span>J'accepte que mes données soient utilisées par LG Service aux seules fins de répondre à ma demande. *</span></label>
+      <button type="submit" class="btn btn--yellow btn--full magnetic" data-strength="0.12"><span>Envoyer la demande</span>[[arrow]]</button>
+      <p class="form__msg" role="status" aria-live="polite"></p>
+      <p class="form__legal">*Champs obligatoires. Les données personnelles que vous nous communiquez sont utilisées par LG Service aux seules fins de répondre à votre demande. <a href="{{root}}vie-privee/">En savoir plus</a>.</p>
+    </form>
+  </div>
+  <div class="container">
+    <div class="map reveal-up">
+      <iframe title="Carte : LG Service, Chemin de la Plaine, Brégnier-Cordon" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+        src="https://maps.google.com/maps?q=Chemin%20de%20la%20Plaine%2C%2001300%20Br%C3%A9gnier-Cordon&z=12&output=embed"></iframe>
+    </div>
+  </div>
+</section>

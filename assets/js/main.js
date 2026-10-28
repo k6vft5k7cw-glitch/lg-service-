@@ -7,7 +7,8 @@
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var finePointer = window.matchMedia('(pointer: fine)').matches;
 
-  document.getElementById('year').textContent = new Date().getFullYear();
+  var yearEl = document.getElementById('year');
+  if (yearEl) yearEl.textContent = new Date().getFullYear();
 
   // Without GSAP (blocked CDN) or with reduced motion: show everything statically.
   if (!window.gsap || !window.ScrollTrigger || reduce) {
@@ -19,6 +20,8 @@
   }
 
   gsap.registerPlugin(ScrollTrigger);
+  gsap.config({ nullTargetWarn: false });
+  var $ = function (sel) { return document.querySelector(sel); };
 
   /* ---------- Smooth scroll ---------- */
   var lenis = null;
@@ -52,17 +55,22 @@
     .fromTo('.hero__img img', { scale: 1.3 }, { scale: 1, duration: 1.8, ease: 'expo.out' }, 0.3)
     .fromTo('.float-card', { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: .9, ease: 'back.out(1.6)', stagger: .15 }, '-=1');
 
-  var loader = document.querySelector('.loader');
-  var counter = { v: 0 };
-  var num = document.querySelector('.loader__num');
-  var lt = gsap.timeline({ onComplete: function () { loader.remove(); } });
-  if (lenis) lenis.stop();
-  lt.to(counter, { v: 100, duration: 1.3, ease: 'power2.inOut', onUpdate: function () { num.textContent = Math.round(counter.v); } })
-    .to('.loader__bar span', { scaleX: 1, duration: 1.3, ease: 'power2.inOut' }, 0)
-    .to('.loader__inner', { opacity: 0, y: -20, duration: .4 })
-    .to('.loader__panel--1', { yPercent: -100, duration: 1, ease: 'expo.inOut' }, '-=.1')
-    .to('.loader__panel--2', { yPercent: 100, duration: 1, ease: 'expo.inOut' }, '<')
-    .add(function () { intro.play(); if (lenis) lenis.start(); }, '-=.75');
+  // Loader shown once per visit on the home page only, then the hero intro plays.
+  var loader = $('.loader');
+  var seen = false;
+  try { seen = sessionStorage.getItem('lg-intro') === '1'; sessionStorage.setItem('lg-intro', '1'); } catch (e) {}
+  if (loader && !seen) {
+    if (lenis) lenis.stop();
+    gsap.timeline({ onComplete: function () { loader.remove(); } })
+      .to('.loader__bar span', { scaleX: 1, duration: .7, ease: 'power2.inOut' })
+      .to('.loader__inner', { opacity: 0, y: -20, duration: .3 })
+      .to('.loader__panel--1', { yPercent: -100, duration: .9, ease: 'expo.inOut' }, '-=.1')
+      .to('.loader__panel--2', { yPercent: 100, duration: .9, ease: 'expo.inOut' }, '<')
+      .add(function () { intro.play(); if (lenis) lenis.start(); }, '-=.7');
+  } else {
+    if (loader) loader.remove();
+    if ($('.hero')) intro.play();
+  }
 
   /* ---------- Header hide on scroll, progress bar ---------- */
   var header = document.querySelector('.header');
@@ -76,22 +84,24 @@
   });
 
   /* ---------- Hero parallax ---------- */
+  if ($('.hero')) {
   gsap.to('.hero__img img', { yPercent: 10, ease: 'none', scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true } });
   gsap.to('.hero__text', { y: -80, opacity: .3, ease: 'none', scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true } });
   gsap.to('.hero__glow', { scale: 1.4, x: -100, ease: 'none', scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true } });
   gsap.to('.float-card--a', { y: -60, ease: 'none', scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true } });
   gsap.to('.float-card--b', { y: -120, ease: 'none', scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true } });
+  }
 
   /* ---------- Marquee reacts to scroll velocity ---------- */
-  var track = document.querySelector('.marquee__track');
-  ScrollTrigger.create({
+  var track = $('.marquee__track');
+  if (track) ScrollTrigger.create({
     trigger: '.marquee', start: 'top bottom', end: 'bottom top',
     onUpdate: function (self) {
       var v = gsap.utils.clamp(-6, 6, self.getVelocity() / 400);
       gsap.to(track, { skewX: -v, duration: .4, overwrite: true });
     }
   });
-  gsap.fromTo('.marquee', { rotate: -4 }, { rotate: 1, ease: 'none', scrollTrigger: { trigger: '.marquee', start: 'top bottom', end: 'bottom top', scrub: true } });
+  if (track) gsap.fromTo('.marquee', { rotate: -4 }, { rotate: 1, ease: 'none', scrollTrigger: { trigger: '.marquee', start: 'top bottom', end: 'bottom top', scrub: true } });
 
   /* ---------- Generic reveals (outside hero) ---------- */
   gsap.utils.toArray('.split').forEach(function (el) {
@@ -133,13 +143,16 @@
     }
   });
   gsap.fromTo('.metaux__bg', { yPercent: -8 }, { yPercent: 8, ease: 'none', scrollTrigger: { trigger: '.metaux', start: 'top bottom', end: 'bottom top', scrub: true } });
-  gsap.fromTo('.year', { xPercent: 30 }, { xPercent: -10, ease: 'none', scrollTrigger: { trigger: '.about', start: 'top bottom', end: 'bottom top', scrub: true } });
+  gsap.utils.toArray('.year').forEach(function (el) {
+    gsap.fromTo(el, { xPercent: 30 }, { xPercent: -10, ease: 'none', scrollTrigger: { trigger: el.parentNode, start: 'top bottom', end: 'bottom top', scrub: true } });
+  });
   gsap.fromTo('.footer__giant', { yPercent: 40, letterSpacing: '0.04em' }, { yPercent: 0, letterSpacing: '-0.06em', ease: 'none', scrollTrigger: { trigger: '.footer', start: 'top bottom', end: 'bottom bottom', scrub: true } });
-  gsap.from('.sticker', { scale: 0, rotate: -40, duration: .8, ease: 'back.out(2)', scrollTrigger: { trigger: '.debarras__media', start: 'top 70%' } });
-  gsap.from('.badge-round', { scale: 0, rotate: -90, duration: 1, ease: 'back.out(1.6)', scrollTrigger: { trigger: '.feature__media', start: 'top 70%' } });
+  gsap.utils.toArray('.sticker, .badge-round').forEach(function (el) {
+    gsap.from(el, { scale: 0, rotate: -60, duration: 1, ease: 'back.out(1.8)', scrollTrigger: { trigger: el.parentNode, start: 'top 75%' } });
+  });
 
   /* ---------- Debarras section rises over the previous ---------- */
-  gsap.from('.debarras', { y: 80, ease: 'none', scrollTrigger: { trigger: '.debarras', start: 'top bottom', end: 'top 40%', scrub: true } });
+  if ($('.debarras:not(.debarras--page)')) gsap.from('.debarras', { y: 80, ease: 'none', scrollTrigger: { trigger: '.debarras', start: 'top bottom', end: 'top 40%', scrub: true } });
 
   /* ---------- Counters ---------- */
   gsap.utils.toArray('.count').forEach(function (el) {
@@ -154,7 +167,8 @@
 
   /* ---------- Steps progress line ---------- */
   var steps = gsap.utils.toArray('.step');
-  var line = document.querySelector('.steps__line span');
+  var line = $('.steps__line span');
+  if (line) {
   gsap.set(line, { '--p': 0 });
   ScrollTrigger.create({
     trigger: '.steps', start: 'top 75%', end: 'bottom 45%', scrub: true,
@@ -164,6 +178,7 @@
     }
   });
   gsap.fromTo(steps, { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: .9, ease: 'power3.out', stagger: .12, scrollTrigger: { trigger: '.steps', start: 'top 85%' } });
+  }
 
   /* ---------- Icon line drawing ---------- */
   document.querySelectorAll('.eng .draw').forEach(function (p) {
@@ -173,16 +188,7 @@
   });
 
   /* ---------- Big phone number ---------- */
-  gsap.from('.bigcta__mask > span', { yPercent: 110, duration: 1.2, ease: 'expo.out', scrollTrigger: { trigger: '.bigcta', start: 'top 75%' } });
-
-  /* ---------- Active nav link ---------- */
-  ['a-propos', 'bennes', 'debarras', 'metaux', 'contact'].forEach(function (id) {
-    var link = document.querySelector('.nav a[href="#' + id + '"]');
-    ScrollTrigger.create({
-      trigger: '#' + id, start: 'top 50%', end: 'bottom 50%',
-      onToggle: function (self) { link.classList.toggle('is-active', self.isActive); }
-    });
-  });
+  if ($('.bigcta')) gsap.from('.bigcta__mask > span', { yPercent: 110, duration: 1.2, ease: 'expo.out', scrollTrigger: { trigger: '.bigcta', start: 'top 75%' } });
 
   /* ---------- Pointer effects (desktop only) ---------- */
   if (finePointer) {
@@ -224,13 +230,15 @@
     });
 
     // Hero image follows pointer slightly
-    var hero = document.querySelector('.hero');
+    var hero = $('.hero');
+    if (hero) {
     var hx = gsap.quickTo('.hero__media', 'x', { duration: 1, ease: 'power3' });
     var hy = gsap.quickTo('.hero__media', 'y', { duration: 1, ease: 'power3' });
     hero.addEventListener('mousemove', function (e) {
       hx((e.clientX / innerWidth - .5) * -24);
       hy((e.clientY / innerHeight - .5) * -24);
     });
+    }
   }
 
   window.addEventListener('load', function () { ScrollTrigger.refresh(); });
@@ -243,11 +251,12 @@
     document.querySelectorAll('a[href^="#"]').forEach(function (a) {
       a.addEventListener('click', function (e) {
         var id = a.getAttribute('href');
-        var target = id === '#top' ? document.body : document.querySelector(id);
+        if (id.length < 2) return;
+        var target = document.querySelector(id);
         if (!target) return;
         e.preventDefault();
         closeMenu();
-        if (lenis) lenis.scrollTo(id === '#top' ? 0 : target, { offset: -20, duration: 1.4 });
+        if (lenis) lenis.scrollTo(id === '#contenu' ? 0 : target, { offset: -20, duration: 1.4 });
         else target.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth' });
       });
     });
@@ -271,16 +280,9 @@
     });
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeMenu(); });
 
-    // Legal dialog
-    var dlg = document.getElementById('legal');
-    document.querySelector('[data-open="legal"]').addEventListener('click', function () {
-      if (dlg.showModal) dlg.showModal(); else dlg.setAttribute('open', '');
-    });
-    dlg.querySelector('.legal__close').addEventListener('click', function () { dlg.close ? dlg.close() : dlg.removeAttribute('open'); });
-    dlg.addEventListener('click', function (e) { if (e.target === dlg) dlg.close(); });
-
     // Contact form → opens the visitor's mail app with a prefilled message
     var form = document.getElementById('contact-form');
+    if (!form) return;
     var msg = form.querySelector('.form__msg');
     form.addEventListener('submit', function (e) {
       e.preventDefault();
